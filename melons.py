@@ -1,3 +1,5 @@
+import random
+import datetime
 """Classes for melon orders."""
 
 
@@ -11,14 +13,29 @@ class AbstractMelonOrder(object):
         self.qty = qty
         self.shipped = False
 
+    def get_base_price(self):
+        """Returns the base price, which varies randomly and conditionally."""
+
+        surcharge = 0
+        now = datetime.datetime.now()
+
+        rush_hour_days = range(5)
+        rush_hour_hours = [8, 9, 10]
+
+        if now.hours in rush_hour_hours and now.date().weekday() in rush_hour_days:
+            surcharge += 4
+
+        return random.randint(5, 9) + surcharge
+
     def get_total(self):
         """Calculate price, including tax."""
 
-        base_price = 5
+        base_price = self.get_base_price()
+        total = (1 + self.tax) * self.qty * base_price
+
         if self.species == "Christmas":
             base_price *= 1.5
 
-        total = (1 + self.tax) * self.qty * base_price
         if self.order_type == "international" and self.qty < 10:
             total += 3
 
